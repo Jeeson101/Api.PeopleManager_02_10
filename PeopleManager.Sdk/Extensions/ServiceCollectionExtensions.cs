@@ -11,13 +11,11 @@ namespace PeopleManager.Sdk.Extensions
 	{
 		public static IServiceCollection AddApi(this IServiceCollection services, string apiUrl)
 		{
-			services.AddHttpClient("PeopleManagerApi", options =>
-			{
-				options.BaseAddress = new Uri(apiUrl);
-			});
+			services.AddHttpClient("PeopleManagerApi", options => { options.BaseAddress = new Uri(apiUrl); });
 
 			services.AddScoped<OrganizationSdk>();
 
 			return services;
 		}
+	}
 }

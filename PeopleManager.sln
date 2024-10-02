@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeopleManager.Dto", "People
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vives.Services.model", "Vives.Services.model\Vives.Services.model.csproj", "{16BCB44F-3935-4761-A6E5-1691E47EE598}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeopleManager.Sdk", "PeopleManager.Sdk\PeopleManager.Sdk.csproj", "{A1DF0D2D-BA09-4CBA-9A9B-FE07B9F97630}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeopleManager.Sdk", "PeopleManager.Sdk\PeopleManager.Sdk.csproj", "{A1DF0D2D-BA09-4CBA-9A9B-FE07B9F97630}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ui", "Ui", "{F595C226-9C39-4E1C-9766-54462681387E}"
 EndProject
@@ -28,6 +28,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{19620E4C-1E34-46A8-B8A8-9FA0DD5BBABF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{F0311520-FC75-4C7B-980A-0AF417DFAFC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeopleManager.Ui.ConsoleApp", "PeopleManager.Ui.ConsoleApp\PeopleManager.Ui.ConsoleApp.csproj", "{9C4F3CD8-B307-4571-A7C4-1949D1589780}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{A1DF0D2D-BA09-4CBA-9A9B-FE07B9F97630}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1DF0D2D-BA09-4CBA-9A9B-FE07B9F97630}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1DF0D2D-BA09-4CBA-9A9B-FE07B9F97630}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C4F3CD8-B307-4571-A7C4-1949D1589780}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C4F3CD8-B307-4571-A7C4-1949D1589780}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C4F3CD8-B307-4571-A7C4-1949D1589780}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C4F3CD8-B307-4571-A7C4-1949D1589780}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +86,7 @@ Global
 		{967103B9-BDD9-40D9-BB9B-8E460AD009F0} = {F0311520-FC75-4C7B-980A-0AF417DFAFC6}
 		{16BCB44F-3935-4761-A6E5-1691E47EE598} = {69349873-6476-4535-9C03-E3B4F9E8C46D}
 		{A1DF0D2D-BA09-4CBA-9A9B-FE07B9F97630} = {19620E4C-1E34-46A8-B8A8-9FA0DD5BBABF}
+		{9C4F3CD8-B307-4571-A7C4-1949D1589780} = {F595C226-9C39-4E1C-9766-54462681387E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6517C9AC-EBB9-4124-A470-26E83326B1D4}
