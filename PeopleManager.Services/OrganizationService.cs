@@ -3,94 +3,124 @@ using PeopleManager.Core;
 using PeopleManager.Dto.Requests;
 using PeopleManager.Dto.Results;
 using PeopleManager.Model;
+using PeopleManager.Services.Extensions.Projection;
+using PeopleManager.Services.Extensions.Validation;
+using Vives.Services.model;
+using Vives.Services.model.Extensions;
 
 namespace PeopleManager.Services
 {
-    public class OrganizationService
-    {
-        private readonly PeopleManagerDbContext _dbContext;
+	public class OrganizationService
+	{
+		private readonly PeopleManagerDbContext _dbContext;
 
-        public OrganizationService(PeopleManagerDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+		public OrganizationService(PeopleManagerDbContext dbContext)
+		{
+			_dbContext = dbContext;
+		}
 
-        //Find
-        public async Task<IList<OrganizationResult>> Find()
-        {
-            return await _dbContext.Organizations
-                .Select(o => new OrganizationResult
-                {
-                    Id = o.Id,
-                    Name = o.Name,
-                    Description = o.Description,
-                    NumberOfMembers = o.Members.Count
-                })
-                .ToListAsync();
-        }
+		//Find
+		public async Task<IList<OrganizationResult>> Find()
+		{
+			return await _dbContext.Organizations
+				.Project()
+				.ToListAsync();
+		}
 
-        //Get (by id)
-        public async Task<OrganizationResult?> Get(int id)
-        {
-            return await _dbContext.Organizations
-                .Select(o => new OrganizationResult
-                {
-                    Id = o.Id,
-                    Name = o.Name,
-                    Description = o.Description,
-                    NumberOfMembers = o.Members.Count
-                })
-                .FirstOrDefaultAsync(p => p.Id == id);
-        }
+		//Get (by id)
+		public async Task<ServiceResult<OrganizationResult>> Get(int id)
+		{
+			var serviceResult = new ServiceResult<OrganizationResult>();
 
-        //Create
-        public async Task<OrganizationResult?> Create(OrganizationRequest request)
-        {
-            var organization = new Organization
-            {
-                Name = request.Name,
-                Description = request.Description
-            };
+			var organization = await _dbContext.Organizations
+				.Project()
+				.FirstOrDefaultAsync(p => p.Id == id);
 
-            _dbContext.Organizations.Add(organization);
-            await _dbContext.SaveChangesAsync();
+			serviceResult.Data = organization;
+			if (organization is null)
+			{
+				serviceResult.NotFound(nameof(Organization), id);
+			}
 
-            return await Get(organization.Id);
-        }
+			return serviceResult;
+		}
 
-        //Update
-        public async Task<OrganizationResult?> Update(int id, OrganizationRequest request)
-        {
-            var organization = _dbContext.Organizations
-                .FirstOrDefault(p => p.Id == id);
+		//Create
+		public async Task<ServiceResult<OrganizationResult>> Create(OrganizationRequest request)
+		{
+			var serviceResult = new ServiceResult<OrganizationResult>();
 
-            if (organization is null)
-            {
-                return null;
-            }
+			//Validate request
+			serviceResult.Validate(request);
 
-            organization.Name = request.Name;
-            organization.Description = request.Description;
+			if (!serviceResult.IsSucces)
+			{
+				return serviceResult;
+			}
 
-            await _dbContext.SaveChangesAsync();
+			var organization = new Organization
+			{
+				Name = request.Name,
+				Description = request.Description
+			};
 
-            return await Get(id);
-        }
+			_dbContext.Organizations.Add(organization);
+			await _dbContext.SaveChangesAsync();
 
-        //Delete
-        public async Task Delete(int id)
-        {
-            var organization = await _dbContext.Organizations
-                .FirstOrDefaultAsync(p => p.Id == id);
+			return await Get(organization.Id);
+		}
 
-            if (organization is null)
-            {
-                return;
-            }
+		//Update
+		public async Task<ServiceResult<OrganizationResult>> Update(int id, OrganizationRequest request)
+		{
 
-            _dbContext.Organizations.Remove(organization);
-            await _dbContext.SaveChangesAsync();
-        }
+			var serviceResult = new ServiceResult<OrganizationResult>();
 
-    }
+			//Validate request
+			serviceResult.Validate(request);
+
+			if (!serviceResult.IsSucces)
+			{
+				return serviceResult;
+			}
+
+			var organization = _dbContext.Organizations
+				.FirstOrDefault(p => p.Id == id);
+
+			if (organization is null)
+			{
+				serviceResult.NotFound(nameof(Organization), id);
+				return serviceResult;
+			}
+
+			organization.Name = request.Name;
+			organization.Description = request.Description;
+
+			await _dbContext.SaveChangesAsync();
+
+			return await Get(organization.Id);
+		}
+
+		//Delete
+		public async Task<ServiceResult> Delete(int id)
+		{
+			var serviceResult = new ServiceResult();
+
+			var organization = await _dbContext.Organizations
+				.FirstOrDefaultAsync(p => p.Id == id);
+
+			if (organization is null)
+			{
+				serviceResult.NotFound(nameof(Organization), id);
+				return serviceResult;
+			}
+
+			_dbContext.Organizations.Remove(organization);
+			await _dbContext.SaveChangesAsync();
+
+			serviceResult.Deleted(nameof(Organization));
+			return serviceResult;
+		}
+
+	}
 }

@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PeopleManager.Core\PeopleManager.Core.csproj" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PeopleManager.Dto\PeopleManager.Dto.csproj" />
     <ProjectReference Include="..\Vives.Services.model\Vives.Services.model.csproj" />
   </ItemGroup>

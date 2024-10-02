@@ -1,104 +1,121 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using PeopleManager.Core;
 using PeopleManager.Dto.Requests;
 using PeopleManager.Dto.Results;
 using PeopleManager.Model;
+using PeopleManager.Services.Extensions.Projection;
+using PeopleManager.Services.Extensions.Validation;
+using Vives.Services.model;
+using Vives.Services.model.Extensions;
 
 namespace PeopleManager.Services
 {
-    public class PersonService
-    {
-        private readonly PeopleManagerDbContext _dbContext;
+	public class PersonService
+	{
+		private readonly PeopleManagerDbContext _dbContext;
 
-        public PersonService(PeopleManagerDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+		public PersonService(PeopleManagerDbContext dbContext)
+		{
+			_dbContext = dbContext;
+		}
 
-        //Find
-        public async Task<IList<PersonResult>> Find()
-        {
-            return await _dbContext.People
-                .Select(p => new PersonResult
-                {
-                    Id = p.Id,
-                    FirstName = p.FirstName,
-                    LastName = p.LastName,
-                    Email = p.Email,
-                    OrganizationId = p.OrganizationId,
-                    OrganizationName = p.Organization != null ? p.Organization.Name : null
-                })
-                .ToListAsync();
-        }
+		//Find
+		public async Task<IList<PersonResult>> Find()
+		{
+			return await _dbContext.People
+				.Project()
+				.ToListAsync();
+		}
 
-        //Get (by id)
-        public async Task<PersonResult?> Get(int id)
-        {
-            return await _dbContext.People
-                .Select(p => new PersonResult
-                {
-                    Id = p.Id,
-                    FirstName = p.FirstName,
-                    LastName = p.LastName,
-                    Email = p.Email,
-                    OrganizationId = p.OrganizationId,
-                    OrganizationName = p.Organization != null ? p.Organization.Name : null
-                })
-                .FirstOrDefaultAsync(p => p.Id == id);
-        }
+		//Get (by id)
+		public async Task<ServiceResult<PersonResult>> Get(int id)
+		{
+			var serviceResult = new ServiceResult<PersonResult>();
 
-        //Create
-        public async Task<PersonResult?> Create(PersonRequest request)
-        {
-            var person = new Person
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Email = request.Email,
-                OrganizationId = request.OrganizationId
-            };
+			var person = await _dbContext.People
+				.Project()
+				.FirstOrDefaultAsync(p => p.Id == id);
 
-            _dbContext.People.Add(person);
-            await _dbContext.SaveChangesAsync();
+			serviceResult.Data = person;
+			if (person is null)
+			{
+				serviceResult.NotFound(nameof(Person), id);
+			}
 
-            return await Get(person.Id);
-        }
+			return serviceResult;
+		}
 
-        //Update
-        public async Task<PersonResult?> Update(int id, PersonRequest request)
-        {
-            var person = await _dbContext.People
-                .FirstOrDefaultAsync(p => p.Id == id);
+		//Create
+		public async Task<ServiceResult<PersonResult>> Create(PersonRequest request)
+		{
+			var serviceResult = new ServiceResult<PersonResult>();
 
-            if (person is null)
-            {
-                return null;
-            }
+			serviceResult.Validate(request);
 
-            person.FirstName = request.FirstName;
-            person.LastName = request.LastName;
-            person.Email = request.Email;
-            person.OrganizationId = request.OrganizationId;
+			if (!serviceResult.IsSucces)
+			{
+				return serviceResult;
+			}
 
-            await _dbContext.SaveChangesAsync();
+			var person = new Person
+			{
+				FirstName = request.FirstName,
+				LastName = request.LastName,
+				Email = request.Email,
+				OrganizationId = request.OrganizationId
+			};
 
-            return await Get(id);
-        }
+			_dbContext.People.Add(person);
+			await _dbContext.SaveChangesAsync();
 
-        //Delete
-        public async Task Delete(int id)
-        {
-            var person = await _dbContext.People
-                .FirstOrDefaultAsync(p => p.Id == id);
+			return await Get(person.Id);
+		}
 
-            if (person is null)
-            {
-                return;
-            }
+		//Update
+		public async Task<ServiceResult<PersonResult>> Update(int id, PersonRequest request)
+		{
+			var serviceResult = new ServiceResult<PersonResult>();
 
-            _dbContext.People.Remove(person);
-            await _dbContext.SaveChangesAsync();
-        }
+			var person = await _dbContext.People
+				.FirstOrDefaultAsync(p => p.Id == id);
 
-    }
+			if (person is null)
+			{
+				serviceResult.NotFound(nameof(Person), id);
+				return serviceResult;
+			}
+
+			person.FirstName = request.FirstName;
+			person.LastName = request.LastName;
+			person.Email = request.Email;
+			person.OrganizationId = request.OrganizationId;
+
+			await _dbContext.SaveChangesAsync();
+
+			return await Get(id);
+		}
+
+		//Delete
+		public async Task<ServiceResult> Delete(int id)
+		{
+			var serviceResult = new ServiceResult();
+
+			var person = await _dbContext.People
+				.FirstOrDefaultAsync(p => p.Id == id);
+
+			if (person is null)
+			{
+				serviceResult.NotFound(nameof(Person), id);
+				return serviceResult;
+			}
+
+			_dbContext.People.Remove(person);
+			await _dbContext.SaveChangesAsync();
+
+			serviceResult.Deleted(nameof(Person));
+			return serviceResult;
+		}
+
+	}
 }

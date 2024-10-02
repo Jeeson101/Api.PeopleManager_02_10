@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PeopleManager.Dto.Requests;
 using PeopleManager.Services;
+using Vives.Services.model;
 
 namespace PeopleManager.Api.Controllers
 {
@@ -46,8 +47,8 @@ namespace PeopleManager.Api.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            await _organizationService.Delete(id);
-            return Ok();
+            var result = await _organizationService.Delete(id);
+            return Ok(result);
         }
 
     }
